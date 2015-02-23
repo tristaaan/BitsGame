@@ -378,6 +378,7 @@ function genPermalink() {
 	link += boardRows + '+';
 	link += boardCols + '+';
 
+	//a few characters can be saved by compressing this string into a base [mode] number
 	resetGrid.forEach(function(el) {
 		link += el;
 	});
