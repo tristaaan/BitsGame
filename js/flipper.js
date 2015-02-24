@@ -1,12 +1,12 @@
-var bitWidth =0;
-var bitHeight=0;
-var bitMargin=0;
-var miniBitWidth =0;
-var miniBitHeight=0;
-var colors = ['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f'];
-var variety = 2;
-var moveNum = 0;
-var board;
+let bitWidth =0;
+let bitHeight=0;
+let bitMargin=0;
+let miniBitWidth =0;
+let miniBitHeight=0;
+let colors = ['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f'];
+let variety = 2;
+let moveNum = 0;
+let board;
 
 $(document).ready(function() {
 	init();
@@ -22,13 +22,13 @@ function init() {
 	miniBitWidth  = $('#miniBit').width();
 	miniBitHeight = $('#miniBit').height();
 
-	var loc = document.location.href;
+	let loc = document.location.href;
 	if(loc.substr(-5) === '.html' || loc.substr(-1) === '/') {
 		//drawBoard(3,3);
     board = new Board(3,3);
 	}
 	else {
-		var args = loc.split('?')[1].split('+');
+		let args = loc.split('?')[1].split('+');
 
 		let mode = parseInt(args[0]);
 		let variety = parseInt(args[1]);
@@ -37,7 +37,7 @@ function init() {
 		drawBoard(boardRows, boardCols);
 
 		resetGrid = new Array();
-		for(var i=0; i<args[4].length;i++) {
+		for(let i=0; i<args[4].length;i++) {
 			resetGrid.push(parseInt(args[4][i]));
 		}
 
@@ -66,17 +66,18 @@ class Board{
   }
 
   draw() {
-    var k=0;
+    let k=0;
     
     $('#status').empty();
     $('#board').empty();
 
-    for(var i=0; i<this.rows; i++) {
-      var cells = [];
-      var width = `${bitWidth * this.cols + bitMargin * this.cols}px`;
-      var inner = '';
+    let width = `${bitWidth * this.cols + bitMargin * this.cols}px`;
+
+    for(let i=0; i<this.rows; i++) {
+      let cells = [];
+      let inner = '';
       inner += `<div id="bitRow" style="width:${width};">`;
-      for(var j = 0; j < this.cols; j++, k++){
+      for(let j = 0; j < this.cols; j++, k++){
         inner += `<div id="bit" class="${k}"` +
         `style="background-color:${this.colors[0]};"></div>`;
         cells.push(k);
@@ -85,9 +86,9 @@ class Board{
       cells.forEach(el => $(`.${el}`).bind('click', () => this.flip(el)) );
     }
 
-    width = `${miniBitWidth * this.variety + bitMargin * this.variety}px`;
-    var pat = `<div id="bitRow" style="width:${width};">`;
-    for(var i = 0; i < this.variety; i++) {
+    let miniWidth = `${miniBitWidth * this.variety + bitMargin * this.variety}px`;
+    let pat = `<div id="bitRow" style="width:${miniWidth};">`;
+    for(let i = 0; i < this.variety; i++) {
       pat += `<div id="miniBit" style="background-color:${this.colors[i]};"></div>`;
     }
     pat += '</div>';
@@ -103,8 +104,8 @@ class Board{
   }
 
   randomize() {
-    var boardSize = this.rows * this.cols;
-    for(var i = 0; i < boardSize * 5; i++) {
+    let boardSize = this.rows * this.cols;
+    for(let i = 0; i < boardSize * 5; i++) {
       this.reverseFlip(this.rand(boardSize));
     }
   }
@@ -119,8 +120,19 @@ class Board{
   }
 
   flip(theBit) {
+    this.moves.push(theBit);
+
     this.grid[theBit] = (this.grid[theBit] + 1) % this.variety;
     $(`.${theBit}`).css('background-color', this.colors[this.grid[theBit] % this.variety]);
+
+    if (this.solved()) {
+     $('#status').html(`Solved in ${this.moves.length} moves! <br/>` +
+     '<button onclick="replay()">Replay</button>' +
+     '<button onclick="genPermalink();">Permalink</button>' +
+     '<input type="text" id="pl" size="25"> </input>');
+
+     moveNum = 0;
+   }
   }
 
   reverseFlip(theBit) {
@@ -132,16 +144,20 @@ class Board{
 
     $(`.${theBit}`).css('background-color', this.colors[this.grid[theBit] % this.variety]);
   }
+
+  solved(){
+    return this.grid.every(bit => bit === 0);
+  }
 }
 
 // function replay() {
 // 	reset();
-// 	var time = 0;
-// 	var moveCount = moves.length;
+// 	let time = 0;
+// 	let moveCount = moves.length;
 // 	//play back in 10 seconds, or 1 move/750ms.
-// 	var inc = Math.min(10000 / moveCount, 500);
+// 	let inc = Math.min(10000 / moveCount, 500);
 
-// 	for (var i=0; i < moveCount; i++) {
+// 	for (let i=0; i < moveCount; i++) {
 // 		time += inc;
 // 		if (mode === 0) {
 // 			setTimeout(flipAdjacent, time, moves[i]);
@@ -206,7 +222,7 @@ class Board{
 // function flipStar(theBit) {
 // 	flip(theBit);
 // 	//above
-// 	var i = 1;
+// 	let i = 1;
 // 	while (grid[theBit-boardCols*i]+1) {
 // 		flip(theBit-boardCols*i);
 // 		i++;
@@ -294,7 +310,7 @@ class Board{
 // function reverseFlipStar(theBit) {
 // 	reverseFlip(theBit);
 // 	//above
-// 	var i = 1;
+// 	let i = 1;
 // 	while (grid[theBit-boardCols*i]+1) {
 // 		reverseFlip(theBit-boardCols*i);
 // 		i++;
@@ -365,7 +381,7 @@ class Board{
 // }
 
 // function getRow(bit) {
-// 	for (var i = 0; i < boardRows; i++) {
+// 	for (let i = 0; i < boardRows; i++) {
 // 		if (bit < i * boardCols) {
 // 			return i-1;
 // 		}
@@ -375,8 +391,8 @@ class Board{
 // }
 
 // function randomize() {
-// 	var boardSize = boardRows * boardCols;
-// 	for(var i = 0; i < boardSize * 5; i++) {
+// 	let boardSize = boardRows * boardCols;
+// 	for(let i = 0; i < boardSize * 5; i++) {
 // 		if(mode === 0) {
 // 			reverseFlipAdjacent(rand(boardSize));
 // 		}
@@ -390,7 +406,7 @@ class Board{
 // }
 
 function genPermalink() {
-	var link = `?${mode}+${variety}+${boardRows}+${boardCols}+`;
+	let link = `?${mode}+${variety}+${boardRows}+${boardCols}+`;
 
 	//a few characters can be saved by compressing this string into a base [mode] number
 	resetGrid.forEach(el => link += el);
