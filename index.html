@@ -21,10 +21,10 @@
 <div id="status"></div><br/>
 <div id="controls">
 	Goal: Turn all the bits black. <br/>
-	<button onclick="reset()" value="Submit" type="button">Reset</button>
-	<button onclick="drawBoard(boardRows,boardCols)" value="Submit" type="button">New</button>
+	<button value="Submit" type="button" id="resetButton">Reset</button>
+	<button value="Submit" type="button" id="newButton">New</button>
 	Rows:
-	<select name="dropMenu" onchange="boardRows=parseInt(this.options[selectedIndex].value); drawBoard(boardRows, boardCols);">
+	<select id="rowsDropdown">
 		<option value="1">1</option>
 		<option value="2">2</option>
 		<option value="3" selected="selected">3</option>
@@ -37,7 +37,7 @@
 		<option value="10">10</option>
 	</select>
 	Columns
-	<select name="dropMenu" onchange="boardCols=parseInt(this.options[selectedIndex].value); drawBoard(boardRows, boardCols);">
+	<select id="colsDropdown">
 		<option value="2">2</option>
 		<option value="3" selected="selected">3</option>
 		<option value="4">4</option>
@@ -49,7 +49,7 @@
 		<option value="10">10</option>
 	</select>
 	Colors:
-	<select name="dropMenu" onchange="variety = parseInt(this.options[selectedIndex].value); drawBoard(boardRows, boardCols);">
+	<select id="varietyDropdown">
 		<option value="2">2</option>
 		<option value="3">3</option>
 		<option value="4">4</option>
@@ -57,10 +57,10 @@
 		<option value="6">6</option>
 	</select>
 	Mode:
-	<select name="dropMenu" onchange="mode = parseInt(this.options[selectedIndex].value); drawBoard(boardRows, boardCols);">
-		<option value="0">Immediate</option>
-		<option value="1">Continuous</option>
-		<option value="2">Single-Double</option>
+	<select id="modeDropdown">
+		<option value="adjacent">Adjacent</option>
+		<option value="star">Continuous</option>
+		<option value="double">Single-Double</option>
 	</select>
 </div>
 <div id="about">

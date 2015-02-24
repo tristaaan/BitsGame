@@ -1,31 +1,42 @@
-let bitWidth =0;
-let bitHeight=0;
-let bitMargin=0;
-let miniBitWidth =0;
-let miniBitHeight=0;
-let colors = ['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f'];
-let variety = 2;
-let moveNum = 0;
-let board;
-
 $(document).ready(function() {
 	init();
 });
 
-function test(){console.log("what now?");}
-
 function init() {
-	bitWidth  = $('#bit').width();
-	bitHeight = $('#bit').height();
-	bitMargin = parseInt($('#bit').css('margin-right'));
 
-	miniBitWidth  = $('#miniBit').width();
-	miniBitHeight = $('#miniBit').height();
+  let colors = ['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f'];
+  let game = new Game();
+
+  function dropDownChange(){
+    let [rows, cols, variety] = [rowsDrop, colsDrop, varietyDrop].map((el) => parseInt(el.val(), 10));
+    new games[gameMode](rows, cols, variety);
+  }
+
+  let rowsDrop = $('#rowsDropdown');
+  let colsDrop = $('#colsDropdown');
+  let varietyDrop = $('#varietyDropdown');
+
+  let gameMode = 'adjacent';
+  let games = {
+    adjacent: AdjacentGame,
+    star: StarGame,
+    double: DoubleGame
+  };
+
+  rowsDrop.bind('change', dropDownChange);
+  colsDrop.bind('change', dropDownChange);
+  varietyDrop.bind('change', dropDownChange);
+  $('#modeDropdown').bind('change', (e) => {
+    gameMode = e.target.value;
+    dropDownChange();
+  });
+
+  $('#resetButton').bind('click', () => game.resetBoard());
+  $('#newButton').bind('click', () => game.draw());
 
 	let loc = document.location.href;
 	if(loc.substr(-5) === '.html' || loc.substr(-1) === '/') {
-		//drawBoard(3,3);
-    board = new Board(3,3);
+    game = new games[gameMode](3, 3, 2, colors);
 	}
 	else {
 		let args = loc.split('?')[1].split('+');
@@ -34,7 +45,7 @@ function init() {
 		let variety = parseInt(args[1]);
 		let boardRows = parseInt(args[2]);
 		let boardCols = parseInt(args[3]);
-		drawBoard(boardRows, boardCols);
+		game.draw(boardRows, boardCols);
 
 		resetGrid = new Array();
 		for(let i=0; i<args[4].length;i++) {
@@ -51,7 +62,8 @@ function init() {
 	}
 }
 
-class Board{
+class Game {
+
   constructor(rows=3, cols=3, variety=2, colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']){
     this.rows = rows;
     this.cols = cols;
@@ -62,6 +74,9 @@ class Board{
     this.resetGrid = [];
     this.moves     = [];
 
+    this.bitWidth  = $('#bit').width();
+    this.bitMargin = parseInt($('#bit').css('margin-right'));
+
     this.draw();
   }
 
@@ -71,23 +86,21 @@ class Board{
     $('#status').empty();
     $('#board').empty();
 
-    let width = `${bitWidth * this.cols + bitMargin * this.cols}px`;
+    let width = `${this.bitWidth * this.cols + this.bitMargin * this.cols}px`;
 
     for(let i=0; i<this.rows; i++) {
       let cells = [];
       let inner = '';
       inner += `<div id="bitRow" style="width:${width};">`;
       for(let j = 0; j < this.cols; j++, k++){
-        inner += `<div id="bit" class="${k}"` +
-        `style="background-color:${this.colors[0]};"></div>`;
+        inner += `<div id="bit" class="${k}" style="background-color:${this.colors[0]};"></div>`;
         cells.push(k);
       }
       $('#board').append(inner);
       cells.forEach(el => $(`.${el}`).bind('click', () => this.flipBits(el)) );
     }
 
-    let miniWidth = `${miniBitWidth * this.variety + bitMargin * this.variety}px`;
-    let pat = `<div id="bitRow" style="width:${miniWidth};">`;
+    let pat = `<div id="bitRow">`;
     for(let i = 0; i < this.variety; i++) {
       pat += `<div id="miniBit" style="background-color:${this.colors[i]};"></div>`;
     }
@@ -106,7 +119,7 @@ class Board{
   randomize() {
     let boardSize = this.rows * this.cols;
     for(let i = 0; i < boardSize * 5; i++) {
-      this.reverseFlip(this.rand(boardSize));
+      this.modeReverseFlip(this.rand(boardSize));
     }
   }
 
@@ -119,11 +132,46 @@ class Board{
     this.resetGrid.forEach((el, index) => $('.'+index).css('background-color', this.colors[el]) );
   }
 
-  flipBits(theBit) {
-    this.flip(theBit);
-    this.moves.push(theBit);
+  flipBits(bit) {
+    this.modeFlip(bit);
+    this.moves.push(bit);
+    this.solved();
+  }
 
-    if (this.solved()) {
+  modeFlip(bit) {
+    this.flip(bit);
+  }
+
+  modeReverseFlip(bit){
+    this.reverseFlip(bit);
+  }
+
+  flip(bit) {
+    this.grid[bit] = (this.grid[bit] + 1) % this.variety;
+    $(`.${bit}`).css('background-color', this.colors[this.grid[bit] % this.variety]);
+  }
+
+  reverseFlip(bit) {
+    this.grid[bit] = (this.grid[bit] - 1);
+
+    if (this.grid[bit] < 0) {
+      this.grid[bit] = this.variety - 1;
+    }
+
+    $(`.${bit}`).css('background-color', this.colors[this.grid[bit] % this.variety]);
+  }
+
+  getRow(bit) {
+   for (let i = 0; i < this.rows; i++) {
+      if (bit < i * this.cols) {
+        return i-1;
+      }
+    }
+    return this.rows - 1;
+  }
+
+  solved(){
+    if (this.grid.every(bit => bit === 0)) {
       $('#status').html(`Solved in ${this.moves.length} moves! <br/>` +
       '<button id="replay-button">Replay</button>' +
       '<button id="pl-button">Permalink</button>' +
@@ -132,25 +180,6 @@ class Board{
       $('#pl-button').bind('click', () => {this.genPermalink()});
       $('#replay-button').bind('click', () => {this.replay()});
     }
-  }
-
-  flip(theBit) {
-    this.grid[theBit] = (this.grid[theBit] + 1) % this.variety;
-    $(`.${theBit}`).css('background-color', this.colors[this.grid[theBit] % this.variety]);
-  }
-
-  reverseFlip(theBit) {
-    this.grid[theBit] = (this.grid[theBit] - 1);
-
-    if (this.grid[theBit] < 0) {
-      this.grid[theBit] = this.variety - 1;
-    }
-
-    $(`.${theBit}`).css('background-color', this.colors[this.grid[theBit] % this.variety]);
-  }
-
-  solved(){
-    return this.grid.every(bit => bit === 0);
   }
 
   replay(){
@@ -162,7 +191,7 @@ class Board{
 
     for (let i=0; i < moveCount; i++) {
       time += inc;
-      setTimeout((bit) => {this.flip(bit)}, time, this.moves[i]);
+      setTimeout((bit) => {this.modeFlip(bit)}, time, this.moves[i]);
     }
   }
 
@@ -191,259 +220,198 @@ class Board{
   } 
 }
 
+class AdjacentGame extends Game{
 
+  modeFlip(bit){
+    this.flipAdjacent(bit);
+  }
 
-// function replay() {
-// 	reset();
-// 	let time = 0;
-// 	let moveCount = moves.length;
-// 	//play back in 10 seconds, or 1 move/750ms.
-// 	let inc = Math.min(10000 / moveCount, 500);
+  modeReverseFlip(bit){
+    this.reverseAdjacentFlip(bit);
+  }
 
-// 	for (let i=0; i < moveCount; i++) {
-// 		time += inc;
-// 		if (mode === 0) {
-// 			setTimeout(flipAdjacent, time, moves[i]);
-// 		}
-// 		else if (mode === 1) {
-// 			setTimeout(flipStar, time, moves[i]);
-// 		}
-// 		else if (mode === 2) {
-// 			setTimeout(flipDouble, time, moves[i]);
-// 		}
-// 	}
-// }
+  flipAdjacent(bit) {
+    this.flip(bit);
+    //top
+    if (this.grid[bit-this.cols]+1) {
+      this.flip(bit-this.cols);
+    }
 
-// function flipBits(abit) {
-// 	if (mode === 0) {
-// 		flipAdjacent(abit);
-// 	}
-// 	else if (mode === 1) {
-// 		flipStar(abit);
-// 	}
-// 	else if (mode === 2) {
-// 		flipDouble(abit);
-// 	}
+    //bottom
+    if (this.grid[bit+this.cols]+1) {
+      this.flip(bit+this.cols);
+    }
 
-// 	moveNum++;
-// 	moves.push(abit);
+    //left
+    if (this.grid[bit-1]+1 && this.getRow(bit) === this.getRow(bit-1)) {
+      this.flip(bit-1);
+    }
 
-// 	if (solved()) {
-// 		$('#status').html(`Solved in ${moveNum} moves! <br/>` +
-// 		'<button onclick="replay()">Replay</button>' +
-// 		'<button onclick="genPermalink();">Permalink</button>' +
-// 		'<input type="text" id="pl" size="25"> </input>');
+    //right
+    if (this.grid[bit+1]+1 && this.getRow(bit) === this.getRow(bit+1)) {
+      this.flip(bit+1);
+    }
+  }
 
-// 		moveNum = 0;
-// 	}
-// }
+  reverseAdjacentFlip(bit){
+    //flip adjacent tiles
+    this.reverseFlip(bit);
+    //top
+    if (this.grid[bit-this.cols]+1) {
+      this.reverseFlip(bit-this.cols);
+    }
 
-// function flipAdjacent(theBit) {
-// 	//flip adjacent tiles
-// 	flip(theBit);
-// 	//top
-// 	if (grid[theBit-boardCols]+1) {
-// 		flip(theBit-boardCols);
-// 	}
+    //bottom
+    if (this.grid[bit+this.cols]+1) {
+      this.reverseFlip(bit+this.cols);
+    }
 
-// 	//bottom
-// 	if (grid[theBit+boardCols]+1) {
-// 		flip(theBit+boardCols);
-// 	}
+    //left
+    if (this.grid[bit-1]+1 && this.getRow(bit) === this.getRow(bit-1)) {
+      this.reverseFlip(bit-1);
+    }
 
-// 	//left
-// 	if (grid[theBit-1]+1 && getRow(theBit) === getRow(theBit-1)) {
-// 		flip(theBit-1);
-// 	}
+    //right
+    if (this.grid[bit+1]+1 && this.getRow(bit) === this.getRow(bit+1)) {
+      this.reverseFlip(bit+1);
+    }
+  }
+}
 
-// 	//right
-// 	if (grid[theBit+1]+1 && getRow(theBit) === getRow(theBit+1)) {
-// 		flip(theBit+1);
-// 	}
-// }
+class StarGame extends Game {
+  modeFlip(bit) {
+    this.flipStar(bit);
+  }
 
-// function flipStar(theBit) {
-// 	flip(theBit);
-// 	//above
-// 	let i = 1;
-// 	while (grid[theBit-boardCols*i]+1) {
-// 		flip(theBit-boardCols*i);
-// 		i++;
-// 	}
+  modeReverseFlip(bit) {
+    this.reverseFlipStar(bit);
+  }
 
-// 	//below
-// 	i = 1;
-// 	while (grid[theBit+boardCols*i]+1) {
-// 		flip(theBit+boardCols*i);
-// 		i++;
-// 	}
+  flipStar(bit) {
+    this.flip(bit);
+    //above
+    let i = 1;
+    while (this.grid[bit-this.cols*i]+1) {
+      this.flip(bit-this.cols*i);
+      i++;
+    }
 
-// 	//left
-// 	i = 1;
-// 	while (grid[theBit-i]+1 && getRow(theBit) === getRow(theBit-i)) {
-// 		flip(theBit-i);
-// 		i++;
-// 	}
+    //below
+    i = 1;
+    while (this.grid[bit+this.cols*i]+1) {
+      this.flip(bit+this.cols*i);
+      i++;
+    }
 
-// 	//right
-// 	i = 1;
-// 	while (grid[theBit+i]+1 && getRow(theBit) === getRow(theBit+i)) {
-// 		flip(theBit+i);
-// 		i++;
-// 	}
-// }
+    //left
+    i = 1;
+    while (this.grid[bit-i]+1 && this.getRow(bit) === this.getRow(bit-i)) {
+      this.flip(bit-i);
+      i++;
+    }
 
-// function flipDouble(theBit) {
-// 	//flip adjacent tiles
-// 	flip(theBit)
-// 	//top
-// 	if (grid[theBit-boardCols]+1) {
-// 		flip(theBit-boardCols);
-// 		flip(theBit-boardCols);
-// 	}
+    //right
+    i = 1;
+    while (this.grid[bit+i]+1 && this.getRow(bit) === this.getRow(bit+i)) {
+      this.flip(bit+i);
+      i++;
+    }
+  }
 
-// 	//bottom
-// 	if (grid[theBit+boardCols]+1) {
-// 		flip(theBit+boardCols);
-// 		flip(theBit+boardCols);
-// 	}
+  reverseFlipStar(bit) {
+    this.reverseFlip(bit);
+    //above
+    let i = 1;
+    while (this.grid[bit-this.cols*i]+1) {
+      this.reverseFlip(bit-this.cols*i);
+      i++;
+    }
 
-// 	//left
-// 	if (grid[theBit-1]+1 && getRow(theBit) === getRow(theBit-1)) {
-// 		flip(theBit-1);
-// 		flip(theBit-1);
-// 	}
+    //below
+    i = 1;
+    while (this.grid[bit+this.cols*i]+1) {
+      this.reverseFlip(bit+this.cols*i);
+      i++;
+    }
 
-// 	//right
-// 	if (grid[theBit+1]+1 && getRow(theBit) === getRow(theBit+1)) {
-// 		flip(theBit+1);
-// 		flip(theBit+1);
-// 	}
-// }
+    //left
+    i = 1;
+    while (this.grid[bit-i]+1 && this.getRow(bit) === this.getRow(bit-i)) {
+      this.reverseFlip(bit-i);
+      i++;
+    }
 
-// function flip(theBit) {
-// 	grid[theBit] = (grid[theBit] + 1) % variety;
-// 	$('.'+theBit).css('background-color', colors[grid[theBit]%variety]);
-// }
+    //right
+    i = 1;
+    while (this.grid[bit+i]+1 && this.getRow(bit) === this.getRow(bit+i)) {
+      this.reverseFlip(bit+i);
+      i++;
+    }
+  }
+}
 
-// function reverseFlipAdjacent(theBit) {
-// 	//flip adjacent tiles
-// 	reverseFlip(theBit);
-// 	//top
-// 	if (grid[theBit-boardCols]+1) {
-// 		reverseFlip(theBit-boardCols);
-// 	}
+class DoubleGame extends Game {
+  modeFlip(bit){
+    this.flipDouble(bit);
+  }
 
-// 	//bottom
-// 	if (grid[theBit+boardCols]+1) {
-// 		reverseFlip(theBit+boardCols);
-// 	}
+  modeReverseFlip(bit){
+    this.reverseFlipDouble(bit);
+  }
 
-// 	//left
-// 	if (grid[theBit-1]+1 && getRow(theBit) === getRow(theBit-1)) {
-// 		reverseFlip(theBit-1);
-// 	}
+  flipDouble(bit) {
+    //flip adjacent tiles
+    this.flip(bit)
+    //top
+    if (this.grid[bit-this.cols]+1) {
+      this.flip(bit-this.cols);
+      this.flip(bit-this.cols);
+    }
 
-// 	//right
-// 	if (grid[theBit+1]+1 && getRow(theBit) === getRow(theBit+1)) {
-// 		reverseFlip(theBit+1);
-// 	}
-// }
+    //bottom
+    if (this.grid[bit+this.cols]+1) {
+      this.flip(bit+this.cols);
+      this.flip(bit+this.cols);
+    }
 
-// function reverseFlipStar(theBit) {
-// 	reverseFlip(theBit);
-// 	//above
-// 	let i = 1;
-// 	while (grid[theBit-boardCols*i]+1) {
-// 		reverseFlip(theBit-boardCols*i);
-// 		i++;
-// 	}
+    //left
+    if (this.grid[bit-1]+1 && this.getRow(bit) === this.getRow(bit-1)) {
+      this.flip(bit-1);
+      this.flip(bit-1);
+    }
 
-// 	//below
-// 	i = 1;
-// 	while (grid[theBit+boardCols*i]+1) {
-// 		reverseFlip(theBit+boardCols*i);
-// 		i++;
-// 	}
+    //right
+    if (this.grid[bit+1]+1 && this.getRow(bit) === this.getRow(bit+1)) {
+      this.flip(bit+1);
+      this.flip(bit+1);
+    }
+  }
 
-// 	//left
-// 	i = 1;
-// 	while (grid[theBit-i]+1 && getRow(theBit) === getRow(theBit-i)) {
-// 		reverseFlip(theBit-i);
-// 		i++;
-// 	}
+  reverseFlipDouble(bit) {
+    //flip adjacent tiles
+    this.reverseFlip(bit);
+    //top
+    if (this.grid[bit-this.cols]+1) {
+      this.reverseFlip(bit-this.cols);
+      this.reverseFlip(bit-this.cols);
+    }
 
-// 	//right
-// 	i = 1;
-// 	while (grid[theBit+i]+1 && getRow(theBit) === getRow(theBit+i)) {
-// 		reverseFlip(theBit+i);
-// 		i++;
-// 	}
-// }
+    //bottom
+    if (this.grid[bit+this.cols]+1) {
+      this.reverseFlip(bit+this.cols);
+      this.reverseFlip(bit+this.cols);
+    }
 
-// function reverseFlipDouble(theBit) {
-// 	//flip adjacent tiles
-// 	reverseFlip(theBit);
-// 	//top
-// 	if (grid[theBit-boardCols]+1) {
-// 		reverseFlip(theBit-boardCols);
-// 		reverseFlip(theBit-boardCols);
-// 	}
+    //left
+    if (this.grid[bit-1]+1 && this.getRow(bit) === this.getRow(bit-1)) {
+      this.reverseFlip(bit-1);
+      this.reverseFlip(bit-1);
+    }
 
-// 	//bottom
-// 	if (grid[theBit+boardCols]+1) {
-// 		reverseFlip(theBit+boardCols);
-// 		reverseFlip(theBit+boardCols);
-// 	}
-
-// 	//left
-// 	if (grid[theBit-1]+1 && getRow(theBit) === getRow(theBit-1)) {
-// 		reverseFlip(theBit-1);
-// 		reverseFlip(theBit-1);
-// 	}
-
-// 	//right
-// 	if (grid[theBit+1]+1 && getRow(theBit) === getRow(theBit+1)) {
-// 		reverseFlip(theBit+1);
-// 		reverseFlip(theBit+1);
-// 	}
-// }
-
-// function reverseFlip(theBit) {
-// 	grid[theBit] = (grid[theBit] - 1);
-
-// 	if (grid[theBit] < 0) {
-// 		grid[theBit] = variety - 1;
-// 	}
-
-// 	$('.'+theBit).css('background-color', colors[grid[theBit] % variety]);
-// }
-
-// function solved() {
-// 	return grid.every(bit => bit === 0);
-// }
-
-// function getRow(bit) {
-// 	for (let i = 0; i < boardRows; i++) {
-// 		if (bit < i * boardCols) {
-// 			return i-1;
-// 		}
-// 	}
-
-// 	return i-1;
-// }
-
-// function randomize() {
-// 	let boardSize = boardRows * boardCols;
-// 	for(let i = 0; i < boardSize * 5; i++) {
-// 		if(mode === 0) {
-// 			reverseFlipAdjacent(rand(boardSize));
-// 		}
-// 		else if(mode === 1) {
-// 			reverseFlipStar(rand(boardSize));
-// 		}
-// 		else if (mode === 2) {
-// 			reverseFlipDouble(rand(boardSize));
-// 		}
-// 	}
-// }
+    //right
+    if (this.grid[bit+1]+1 && this.getRow(bit) === this.getRow(bit+1)) {
+      this.reverseFlip(bit+1);
+      this.reverseFlip(bit+1);
+    }
+  }
+}
