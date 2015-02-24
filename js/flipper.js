@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	init();
+  init();
 });
 
 function init() {
@@ -9,7 +9,7 @@ function init() {
 
   function dropDownChange(){
     let [rows, cols, variety] = [rowsDrop, colsDrop, varietyDrop].map((el) => parseInt(el.val(), 10));
-    new games[gameMode](rows, cols, variety);
+    game = new games[gameMode](rows, cols, variety);
   }
 
   let rowsDrop = $('#rowsDropdown');
@@ -32,51 +32,48 @@ function init() {
   });
 
   $('#resetButton').bind('click', () => game.resetBoard());
-  $('#newButton').bind('click', () => game.draw());
+  $('#newButton').bind('click', () => game.newBoard());
 
-	let loc = document.location.href;
-	if(loc.substr(-5) === '.html' || loc.substr(-1) === '/') {
-    game = new games[gameMode](3, 3, 2, colors);
-	}
-	else {
-		let args = loc.split('?')[1].split('+');
+  let loc = document.location.href;
+  if(loc.substr(-5) === '.html' || loc.substr(-1) === '/') {
+    game = new games[gameMode](3, 3, 2);
+  }
+  else {
+    let args = loc.split('?')[1].split('+');
+    let mode = args[0];
+    let [ /* mode */, variety, rows, cols /* resetGrid, moves */] = args.map((el) => parseInt(el, 10));
+    let resetGrid = args[4].split('').map((el) => parseInt(el, 10));
+    let moves = args[5].split(',').map((el) => parseInt(el, 10));
 
-		let mode = parseInt(args[0]);
-		let variety = parseInt(args[1]);
-		let boardRows = parseInt(args[2]);
-		let boardCols = parseInt(args[3]);
-		game.draw(boardRows, boardCols);
+    game = new games[mode](rows, cols, variety, resetGrid, moves);
+    setTimeout(() => game.replay(), 1000);
 
-		resetGrid = new Array();
-		for(let i=0; i<args[4].length;i++) {
-			resetGrid.push(parseInt(args[4][i]));
-		}
-
-		moves = new Array();
-		args[5].split(',').forEach(el => moves.push( parseInt(el) ) );
-
-		reset();
-		setTimeout(replay, 1000);
-
-		$('#status').html(`Replay of ${moves.length} moves.`);
-	}
+    $('#status').html(`Replay of ${moves.length} moves.`);
+  }
 }
 
 class Game {
 
-  constructor(rows=3, cols=3, variety=2, colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']){
+  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']){
     this.rows = rows;
     this.cols = cols;
     this.variety = variety;
-    this.colors = colors;
+    this.colors  = colors;
     
-    this.grid      = [];
-    this.resetGrid = [];
-    this.moves     = [];
+    this.grid      = resetGrid.slice();
+    this.resetGrid = resetGrid.slice();
+    this.moves     = moves.slice();
 
     this.bitWidth  = $('#bit').width();
     this.bitMargin = parseInt($('#bit').css('margin-right'));
+    this.mode = "plain";
 
+    this.draw();
+  }
+
+  newBoard(){
+    this.resetGrid = [];
+    this.moves = [];
     this.draw();
   }
 
@@ -86,34 +83,41 @@ class Game {
     $('#status').empty();
     $('#board').empty();
 
-    let width = `${this.bitWidth * this.cols + this.bitMargin * this.cols}px`;
+    const width = `${this.bitWidth * this.cols + this.bitMargin * this.cols}px`;
 
     for(let i=0; i<this.rows; i++) {
       let cells = [];
       let inner = '';
       inner += `<div id="bitRow" style="width:${width};">`;
       for(let j = 0; j < this.cols; j++, k++){
-        inner += `<div id="bit" class="${k}" style="background-color:${this.colors[0]};"></div>`;
+        if (this.resetGrid.length == 0){
+          inner += `<div id="bit" class="${k}" style="background-color:${this.colors[0]};"></div>`;
+        }
+        else {
+          inner += `<div id="bit" class="${k}" style="background-color:${this.colors[this.resetGrid[k]]};"></div>`;
+        }
         cells.push(k);
       }
       $('#board').append(inner);
       cells.forEach(el => $(`.${el}`).bind('click', () => this.flipBits(el)) );
     }
 
-    let pat = `<div id="bitRow">`;
+    let pattern = `<div id="bitRow">`;
     for(let i = 0; i < this.variety; i++) {
-      pat += `<div id="miniBit" style="background-color:${this.colors[i]};"></div>`;
+      pattern += `<div id="miniBit" style="background-color:${this.colors[i]};"></div>`;
     }
-    pat += '</div>';
-    $('#pattern').html(pat);
+    pattern += '</div>';
+    $('#pattern').html(pattern);
 
     while (this.grid.length < this.cols*this.rows) {
       this.grid.push(0);
     }
 
-    this.randomize();
-
-    this.grid.forEach((el, index) => this.resetGrid[index] = el); 
+    if (this.resetGrid.length == 0){
+      this.randomize();
+      this.grid.forEach((el, index) => this.resetGrid[index] = el);
+    }
+    console.log(this.resetGrid);
   }
 
   randomize() {
@@ -186,8 +190,7 @@ class Game {
     this.resetBoard();
     let time = 0;
     let moveCount = this.moves.length;
-    //play back in 10 seconds, or 1 move/750ms.
-    let inc = Math.min(10000 / moveCount, 500);
+    let inc = Math.min(10000 / moveCount, 500); //play back in 10 seconds, or 1 move/750ms.
 
     for (let i=0; i < moveCount; i++) {
       time += inc;
@@ -210,7 +213,7 @@ class Game {
         link += el;
       }
       else {
-        link += el + ',';
+        link += `${el},`;
       }
     });
 
@@ -221,6 +224,10 @@ class Game {
 }
 
 class AdjacentGame extends Game{
+  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']){
+    super(rows, cols, variety, resetGrid, moves, colors);
+    this.mode = "adjacent";
+  }
 
   modeFlip(bit){
     this.flipAdjacent(bit);
@@ -279,6 +286,11 @@ class AdjacentGame extends Game{
 }
 
 class StarGame extends Game {
+  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']){
+    super(rows, cols, variety, resetGrid, moves, colors);
+    this.mode = 'star';
+  }
+
   modeFlip(bit) {
     this.flipStar(bit);
   }
@@ -351,6 +363,11 @@ class StarGame extends Game {
 }
 
 class DoubleGame extends Game {
+  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']){
+    super(rows, cols, variety, resetGrid, moves, colors);
+    this.mode = 'double';
+  }
+
   modeFlip(bit){
     this.flipDouble(bit);
   }
