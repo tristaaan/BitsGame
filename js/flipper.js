@@ -18,11 +18,11 @@ $(document).ready(function() {
 });
 
 function init() {
-	bitWidth = $('#bit').width();
+	bitWidth  = $('#bit').width();
 	bitHeight = $('#bit').height();
 	bitMargin = parseInt($('#bit').css('margin-right'));
 
-	miniBitWidth = $('#miniBit').width();
+	miniBitWidth  = $('#miniBit').width();
 	miniBitHeight = $('#miniBit').height();
 
 	var loc = document.location.href;
@@ -44,15 +44,12 @@ function init() {
 		}
 
 		moves = new Array();
-		args[5].split(',').forEach(function(el){
-			moves.push(el);
-		});
+		args[5].split(',').forEach(el => moves.push( parseInt(el) ) );
 
 		reset();
-		setTimeout('replay()', 1000);
+		setTimeout(replay, 1000);
 
-		$('#status').innerHTML = 'Replay of ' + moves.length + ' moves.';
-		$('#status').innerHTML += '<button onclick="replay()">Replay</button>';
+		$('#status').html(`Replay of ${moves.length} moves.`);
 	}
 }
 
@@ -67,21 +64,21 @@ function drawBoard(rows, cols) {
 	boardCols = cols;
 
 	for(var i=0; i<rows; i++) {
-		var width = (bitWidth * cols + bitMargin * cols) + 'px';
+		var width = `${bitWidth * cols + bitMargin * cols}px`;
 		var inner = '';
-		inner += '<div id="bitRow" style="width: ' + width + ';">';
+		inner += `<div id="bitRow" style="width:${width};">`;
 		for(var j=0; j<cols; j++, k++){
-			inner += '<div id="bit" class="' + k + '"' +
-			'style="background-color:' + colors[0] + ';"' + 
-			'onclick="flipBits('+k+')"></div>';
+			inner += `<div id="bit" class="${k}"` +
+			`style="background-color:${colors[0]};"` + 
+			`onclick="flipBits(${k})"></div>`;
 		}
 		$('#board').append(inner);
 	}
 
 	width = (miniBitWidth * variety + bitMargin * variety)+'px';
-	var pat = '<div id="bitRow" style="width: ' + width + ';">';
+	var pat = `<div id="bitRow" style="width:${width};">`;
 	for(var i=0; i<variety; i++) {
-		pat += '<div id="miniBit" style="background-color:'+colors[i]+';"></div>';
+		pat += `<div id="miniBit" style="background-color:${colors[i]};"></div>`;
 	}
 	pat += '</div>';
 	$('#pattern').html(pat);
@@ -96,19 +93,12 @@ function drawBoard(rows, cols) {
 
 	randomize();
 
-	grid.forEach(function(el, index) {
-		resetGrid[index] = el;
-	});
+	grid.forEach((el, index) => resetGrid[index] = el);
 }
 
 function reset() {
-	resetGrid.forEach(function(el, index) {
-		grid[index] = el;
-	});
-
-	resetGrid.forEach(function(element, index) {
-		$('.'+index).css('background-color', colors[element]);
-	});
+	resetGrid.forEach((el, index) => grid[index] = el);
+	resetGrid.forEach((el, index) => $('.'+index).css('background-color', colors[el]) );
 }
 
 function replay() {
@@ -147,11 +137,12 @@ function flipBits(abit) {
 	moves.push(abit);
 
 	if (solved()) {
-		$('#status').html('Solved in ' +moveNum+ ' moves! <br/>' +
+		$('#status').html(`Solved in ${moveNum} moves! <br/>` +
 		'<button onclick="replay()">Replay</button>' +
 		'<button onclick="genPermalink();">Permalink</button>' +
 		'<input type="text" id="pl" size="25"> </input>');
-		moveNum=0;
+
+		moveNum = 0;
 	}
 }
 
@@ -268,7 +259,7 @@ function reverseFlipAdjacent(theBit) {
 }
 
 function reverseFlipStar(theBit) {
- 	reverseFlip(theBit);
+	reverseFlip(theBit);
 	//above
 	var i = 1;
 	while (grid[theBit-boardCols*i]+1) {
@@ -337,14 +328,12 @@ function reverseFlip(theBit) {
 }
 
 function solved() {
-	return grid.every(function(bit) {
-		return bit === 0;
-	});
+	return grid.every(bit => bit === 0);
 }
 
 function getRow(bit) {
 	for (var i = 0; i < boardRows; i++) {
-		if(bit < i * boardCols) {
+		if (bit < i * boardCols) {
 			return i-1;
 		}
 	}
@@ -353,7 +342,7 @@ function getRow(bit) {
 }
 
 function randomize() {
-	var boardSize = boardRows*boardCols;
+	var boardSize = boardRows * boardCols;
 	for(var i = 0; i < boardSize * 5; i++) {
 		if(mode === 0) {
 			reverseFlipAdjacent(rand(boardSize));
@@ -368,24 +357,18 @@ function randomize() {
 }
 
 function rand(max) {
-  return Math.floor(Math.random() * (max));
+	return Math.floor(Math.random() * (max));
 }
 
 function genPermalink() {
-	var link = '?';
-	link += mode + '+';
-	link += variety + '+';
-	link += boardRows + '+';
-	link += boardCols + '+';
+	var link = `?${mode}+${variety}+${boardRows}+${boardCols}+`;
 
 	//a few characters can be saved by compressing this string into a base [mode] number
-	resetGrid.forEach(function(el) {
-		link += el;
-	});
+	resetGrid.forEach(el => link += el);
 
 	link += '+';
 
-	moves.forEach(function(el, index) {
+	moves.forEach((el, index) => {
 		if (index === moves.length-1) {
 			link += el;
 		}
