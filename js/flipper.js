@@ -83,7 +83,7 @@ class Board{
         cells.push(k);
       }
       $('#board').append(inner);
-      cells.forEach(el => $(`.${el}`).bind('click', () => this.flip(el)) );
+      cells.forEach(el => $(`.${el}`).bind('click', () => this.flipBits(el)) );
     }
 
     let miniWidth = `${miniBitWidth * this.variety + bitMargin * this.variety}px`;
@@ -119,20 +119,24 @@ class Board{
     this.resetGrid.forEach((el, index) => $('.'+index).css('background-color', this.colors[el]) );
   }
 
-  flip(theBit) {
+  flipBits(theBit) {
+    this.flip(theBit);
     this.moves.push(theBit);
 
+    if (this.solved()) {
+      $('#status').html(`Solved in ${this.moves.length} moves! <br/>` +
+      '<button id="replay-button">Replay</button>' +
+      '<button id="pl-button">Permalink</button>' +
+      '<input type="text" id="pl" size="25"> </input>');
+
+      $('#pl-button').bind('click', () => {this.genPermalink()});
+      $('#replay-button').bind('click', () => {this.replay()});
+    }
+  }
+
+  flip(theBit) {
     this.grid[theBit] = (this.grid[theBit] + 1) % this.variety;
     $(`.${theBit}`).css('background-color', this.colors[this.grid[theBit] % this.variety]);
-
-    if (this.solved()) {
-     $('#status').html(`Solved in ${this.moves.length} moves! <br/>` +
-     '<button onclick="replay()">Replay</button>' +
-     '<button onclick="genPermalink();">Permalink</button>' +
-     '<input type="text" id="pl" size="25"> </input>');
-
-     moveNum = 0;
-   }
   }
 
   reverseFlip(theBit) {
@@ -148,7 +152,46 @@ class Board{
   solved(){
     return this.grid.every(bit => bit === 0);
   }
+
+  replay(){
+    this.resetBoard();
+    let time = 0;
+    let moveCount = this.moves.length;
+    //play back in 10 seconds, or 1 move/750ms.
+    let inc = Math.min(10000 / moveCount, 500);
+
+    for (let i=0; i < moveCount; i++) {
+      time += inc;
+      setTimeout((bit) => {this.flip(bit)}, time, this.moves[i]);
+    }
+  }
+
+  genPermalink() {
+    let link = `?${this.mode}+${this.variety}+${this.rows}+${this.cols}+`;
+
+    //a few characters can be saved by compressing this string into a base [variety] number
+    //eg variety=2, board = 110001111 => 399
+    //.. variety=6, board = 013452123 => 457971 (prepend 0's when parsing)
+    this.resetGrid.forEach(el => link += el);
+
+    link += '+';
+
+    this.moves.forEach((el, index) => {
+      if (index === this.moves.length-1) {
+        link += el;
+      }
+      else {
+        link += el + ',';
+      }
+    });
+
+    //return document.location.origin + document.location.pathname + link;
+    $('#pl').val(document.location.origin + document.location.pathname + link);
+    $('#pl').select();
+  } 
 }
+
+
 
 // function replay() {
 // 	reset();
@@ -404,25 +447,3 @@ class Board{
 // 		}
 // 	}
 // }
-
-function genPermalink() {
-	let link = `?${mode}+${variety}+${boardRows}+${boardCols}+`;
-
-	//a few characters can be saved by compressing this string into a base [mode] number
-	resetGrid.forEach(el => link += el);
-
-	link += '+';
-
-	moves.forEach((el, index) => {
-		if (index === moves.length-1) {
-			link += el;
-		}
-		else {
-			link += el + ',';
-		}
-	});
-
-	//return document.location.origin + document.location.pathname + link;
-	$('#pl').val(document.location.origin + document.location.pathname + link);
-	$('#pl').select();
-} 
