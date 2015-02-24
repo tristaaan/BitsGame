@@ -11,6 +11,6 @@ gulp.task('scripts', function () {
 
 gulp.task('default', ['scripts']);
 
-gulp.task('watch', function(){
+gulp.task('watch', ['scripts'], function(){
 	gulp.watch('js/!(compiled)*.js', ['scripts']);
 });
