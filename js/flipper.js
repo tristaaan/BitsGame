@@ -8,8 +8,11 @@ function init() {
   let game = {};
   let gameMode = 'adjacent';
   const games = {
+    0: AdjacentGame,
     adjacent: AdjacentGame,
+    1: StarGame,
     star: StarGame,
+    2: DoubleGame,
     double: DoubleGame
   };
 
