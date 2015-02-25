@@ -1,9 +1,9 @@
 {
   "name": "bits",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "",
   "main": "gulpfile.js",
-  "author": "",
+  "author": "Tristan Wright",
   "license": "ISC",
   "devDependencies": {
     "gulp": "^3.8.11",
