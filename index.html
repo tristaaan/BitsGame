@@ -1,84 +1,82 @@
-
 <html>
 <head>
-	<title>Bits</title>
-	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+  <title>Bits</title>
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-	<script src="js/compiled.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script src="js/compiled.js"></script>
 </head>
 <body>
-	<div id="board">
-		<div id="bitRow">
-			<div id="bit"></div>
-		</div>
-	</div>
-	<br/>
-<div id="pattern">
-	<div id="miniBit"></div>
-</div>
-<div id="status"></div><br/>
-<div id="controls">
-	Goal: Turn all the bits black. <br/>
-	<button value="Submit" type="button" id="resetButton">Reset</button>
-	<button value="Submit" type="button" id="newButton">New</button>
-	Rows:
-	<select id="rowsDropdown">
-		<option value="1">1</option>
-		<option value="2">2</option>
-		<option value="3" selected="selected">3</option>
-		<option value="4">4</option>
-		<option value="5">5</option>
-		<option value="6">6</option>
-		<option value="7">7</option>
-		<option value="8">8</option>
-		<option value="9">9</option>
-		<option value="10">10</option>
-	</select>
-	Columns
-	<select id="colsDropdown">
-		<option value="2">2</option>
-		<option value="3" selected="selected">3</option>
-		<option value="4">4</option>
-		<option value="5">5</option>
-		<option value="6">6</option>
-		<option value="7">7</option>
-		<option value="8">8</option>
-		<option value="9">9</option>
-		<option value="10">10</option>
-	</select>
-	Colors:
-	<select id="varietyDropdown">
-		<option value="2">2</option>
-		<option value="3">3</option>
-		<option value="4">4</option>
-		<option value="5">5</option>
-		<option value="6">6</option>
-	</select>
-	Mode:
-	<select id="modeDropdown">
-		<option value="adjacent">Adjacent</option>
-		<option value="star">Continuous</option>
-		<option value="double">Single-Double</option>
-	</select>
-</div>
-<div id="about">
-<br/>
-<dl>
-	<dt>Goal:</dt>
-		<dd>Turn all the bits black.</dd>
-	<dt>Modes:</dt>
-		<dt class="sub">Immediate</dt>
-			<dd>The clicked bit and its adjacent bits get incremented by one.<dd>
-		</dd>
-		<dt class="sub">Continuous</dt>
-			<dd>The clicked bit and all bits above, below, left, and right get incremented by one.<dd>
-		</dd>
-		<dt class="sub">Single-Double</dt>
-			<dd>The clicked bit gets incremented by one and the immediate adjacent by two. Best played on a 1 row board and more than two colors.<dd>
-		</dd>
-</dl>
-</div>
+  <div id="board">
+    <div id="bitRow">
+      <div class="bit"></div>
+    </div>
+  </div><br/>
+  <div id="pattern">
+    <div class="miniBit"></div>
+  </div>
+  <div id="status"></div><br/>
+  <div id="controls">
+    Goal: Turn all the bits black. <br/>
+    <button value="Submit" type="button" id="resetButton">Reset</button>
+    <button value="Submit" type="button" id="newButton">New</button>
+    Rows:
+    <select id="rowsDropdown">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3" selected="selected">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+    </select>
+    Columns
+    <select id="colsDropdown">
+      <option value="2">2</option>
+      <option value="3" selected="selected">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+    </select>
+    Colors:
+    <select id="varietyDropdown">
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+    </select>
+    Mode:
+    <select id="modeDropdown">
+      <option value="adjacent">Adjacent</option>
+      <option value="star">Continuous</option>
+      <option value="double">Single-Double</option>
+    </select>
+  </div>
+  <div id="about">
+    <br/>
+    <dl>
+      <dt>Goal:</dt>
+      <dd>Turn all the bits black.</dd>
+      <dt>Modes:</dt>
+      <dt class="sub">Immediate</dt>
+      <dd>The clicked bit and its adjacent bits get incremented by one.<dd>
+      </dd>
+      <dt class="sub">Continuous</dt>
+      <dd>The clicked bit and all bits above, below, left, and right get incremented by one.<dd>
+      </dd>
+      <dt class="sub">Single-Double</dt>
+      <dd>The clicked bit gets incremented by one and the immediate adjacent by two. Best played on a 1 row board and more than two colors.<dd>
+      </dd>
+    </dl>
+  </div>
 </body>
 </html>

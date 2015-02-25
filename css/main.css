@@ -1,67 +1,61 @@
 body{
-	text-align:center;
-	font-family: 'Lato', sans-serif;
+  text-align:center;
+  font-family: 'Lato', sans-serif;
 }
 
 #board{
-	width: 100%;
-	margin: 0px auto;
+  width: 100%;
+  margin: 0px auto;
 }
 
 #bitRow{
-	height: 50px;
-	margin: 5px auto;
+  height: 50px;
+  margin: 5px auto;
 }
 
-#bit{
-	background-color: #000000;
-	margin: 0 5px 0 0;
-	width: 50px;
-	height: 50px;
-	float: left;
-	-webkit-transition: background-color 0.5s ease;
-	-moz-transition: background-color 0.5s ease;
-	transition: background-color 0.5s ease;
-}
-
-.glow{
-	-webkit-box-shadow: #111 0 0 2px;
-	-moz-box-shadow: #111 0 0 2px;
-	box-shadow: #111 0 0 2px;
-}
-
-#miniBit{
- 	width: 20px;
-	height: 20px;
-	float: left;
-	background-color: #000000;
-	margin: 0 5px 0 0;
+.bit{
+  background-color: #000000;
+  margin: 0 5px 0 0;
+  width: 50px;
+  height: 50px;
+  float: left;
+  -webkit-transition: background-color 0.5s ease;
+  -moz-transition: background-color 0.5s ease;
+  transition: background-color 0.5s ease;
 }
 
 #pattern{
-	height: 35px;
-	display: inline-block;
+  height: 35px;
+  display: inline-block;
+}
+
+.miniBit{
+  width: 20px;
+  height: 20px;
+  float: left;
+  background-color: #000000;
+  margin: 0 5px 0 0;
 }
 
 #status{
-	height: 35px;
-	font-size: 24px;
+  height: 35px;
+  font-size: 24px;
 }
 
 #about{
-	margin: 0px auto;
-	text-align: left;
-	width: 450px;
+  margin: 0px auto;
+  text-align: left;
+  width: 450px;
 }
 
 dt{
-	font-weight: bold;
+  font-weight: bold;
 }
 
 dd, dt.sub{
-	margin-left: 20px;
+  margin-left: 20px;
 }
 
 dt.sub+dd{
-	margin-left: 40px;
+  margin-left: 40px;
 }

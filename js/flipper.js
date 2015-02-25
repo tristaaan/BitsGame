@@ -4,10 +4,16 @@ $(document).ready(function() {
 
 function init() {
 
-  let colors = ['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f'];
-  let game = new Game();
+  const colors = ['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f'];
+  let game = {};
+  let gameMode = 'adjacent';
+  const games = {
+    adjacent: AdjacentGame,
+    star: StarGame,
+    double: DoubleGame
+  };
 
-  function dropDownChange(){
+  function dropDownChange() {
     let [rows, cols, variety] = [rowsDrop, colsDrop, varietyDrop].map((el) => parseInt(el.val(), 10));
     game = new games[gameMode](rows, cols, variety);
   }
@@ -15,13 +21,6 @@ function init() {
   let rowsDrop = $('#rowsDropdown');
   let colsDrop = $('#colsDropdown');
   let varietyDrop = $('#varietyDropdown');
-
-  let gameMode = 'adjacent';
-  let games = {
-    adjacent: AdjacentGame,
-    star: StarGame,
-    double: DoubleGame
-  };
 
   rowsDrop.bind('change', dropDownChange);
   colsDrop.bind('change', dropDownChange);
@@ -54,7 +53,7 @@ function init() {
 
 class Game {
 
-  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']){
+  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']) {
     this.rows = rows;
     this.cols = cols;
     this.variety = variety;
@@ -64,14 +63,14 @@ class Game {
     this.resetGrid = resetGrid.slice();
     this.moves     = moves.slice();
 
-    this.bitWidth  = $('#bit').width();
-    this.bitMargin = parseInt($('#bit').css('margin-right'));
+    this.bitWidth  = $('.bit').width();
+    this.bitMargin = parseInt($('.bit').css('margin-right'));
     this.mode = "plain";
 
     this.draw();
   }
 
-  newBoard(){
+  newBoard() {
     this.resetGrid = [];
     this.moves = [];
     this.draw();
@@ -89,22 +88,22 @@ class Game {
       let cells = [];
       let inner = '';
       inner += `<div id="bitRow" style="width:${width};">`;
-      for(let j = 0; j < this.cols; j++, k++){
-        if (this.resetGrid.length == 0){
-          inner += `<div id="bit" class="${k}" style="background-color:${this.colors[0]};"></div>`;
+      for(let j = 0; j < this.cols; j++, k++) {
+        if (this.resetGrid.length == 0) {
+          inner += `<div id="${k}" class="bit" style="background-color:${this.colors[0]};"></div>`;
         }
         else {
-          inner += `<div id="bit" class="${k}" style="background-color:${this.colors[this.resetGrid[k]]};"></div>`;
+          inner += `<div id="${k}" class="bit" style="background-color:${this.colors[this.resetGrid[k]]};"></div>`;
         }
         cells.push(k);
       }
       $('#board').append(inner);
-      cells.forEach(el => $(`.${el}`).bind('click', () => this.flipBits(el)) );
+      cells.forEach(el => $(`#${el}`).bind('click', () => this.flipBits(el)) );
     }
 
     let pattern = `<div id="bitRow">`;
     for(let i = 0; i < this.variety; i++) {
-      pattern += `<div id="miniBit" style="background-color:${this.colors[i]};"></div>`;
+      pattern += `<div class="miniBit" style="background-color:${this.colors[i]};"></div>`;
     }
     pattern += '</div>';
     $('#pattern').html(pattern);
@@ -113,11 +112,10 @@ class Game {
       this.grid.push(0);
     }
 
-    if (this.resetGrid.length == 0){
+    if (this.resetGrid.length == 0) {
       this.randomize();
       this.grid.forEach((el, index) => this.resetGrid[index] = el);
     }
-    console.log(this.resetGrid);
   }
 
   randomize() {
@@ -146,13 +144,13 @@ class Game {
     this.flip(bit);
   }
 
-  modeReverseFlip(bit){
+  modeReverseFlip(bit) {
     this.reverseFlip(bit);
   }
 
   flip(bit) {
     this.grid[bit] = (this.grid[bit] + 1) % this.variety;
-    $(`.${bit}`).css('background-color', this.colors[this.grid[bit] % this.variety]);
+    $(`#${bit}`).css('background-color', this.colors[this.grid[bit] % this.variety]);
   }
 
   reverseFlip(bit) {
@@ -162,7 +160,7 @@ class Game {
       this.grid[bit] = this.variety - 1;
     }
 
-    $(`.${bit}`).css('background-color', this.colors[this.grid[bit] % this.variety]);
+    $(`#${bit}`).css('background-color', this.colors[this.grid[bit] % this.variety]);
   }
 
   getRow(bit) {
@@ -174,7 +172,7 @@ class Game {
     return this.rows - 1;
   }
 
-  solved(){
+  solved() {
     if (this.grid.every(bit => bit === 0)) {
       $('#status').html(`Solved in ${this.moves.length} moves! <br/>` +
       '<button id="replay-button">Replay</button>' +
@@ -186,7 +184,7 @@ class Game {
     }
   }
 
-  replay(){
+  replay() {
     this.resetBoard();
     let time = 0;
     let moveCount = this.moves.length;
@@ -223,17 +221,17 @@ class Game {
   } 
 }
 
-class AdjacentGame extends Game{
-  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']){
+class AdjacentGame extends Game {
+  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']) {
     super(rows, cols, variety, resetGrid, moves, colors);
     this.mode = "adjacent";
   }
 
-  modeFlip(bit){
+  modeFlip(bit) {
     this.flipAdjacent(bit);
   }
 
-  modeReverseFlip(bit){
+  modeReverseFlip(bit) {
     this.reverseAdjacentFlip(bit);
   }
 
@@ -260,7 +258,7 @@ class AdjacentGame extends Game{
     }
   }
 
-  reverseAdjacentFlip(bit){
+  reverseAdjacentFlip(bit) {
     //flip adjacent tiles
     this.reverseFlip(bit);
     //top
@@ -286,7 +284,7 @@ class AdjacentGame extends Game{
 }
 
 class StarGame extends Game {
-  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']){
+  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']) {
     super(rows, cols, variety, resetGrid, moves, colors);
     this.mode = 'star';
   }
@@ -363,16 +361,16 @@ class StarGame extends Game {
 }
 
 class DoubleGame extends Game {
-  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']){
+  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']) {
     super(rows, cols, variety, resetGrid, moves, colors);
     this.mode = 'double';
   }
 
-  modeFlip(bit){
+  modeFlip(bit) {
     this.flipDouble(bit);
   }
 
-  modeReverseFlip(bit){
+  modeReverseFlip(bit) {
     this.reverseFlipDouble(bit);
   }
 
