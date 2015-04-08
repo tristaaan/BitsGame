@@ -1,13 +1,14 @@
 {
   "name": "bits",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "repository": "https://github.com/tristaaan/BitsGame",
   "description": "",
   "main": "gulpfile.js",
   "author": "Tristan Wright",
   "license": "ISC",
   "devDependencies": {
     "gulp": "^3.8.11",
-    "gulp-babel": "^4.0.0",
-    "gulp-concat": "^2.5.2"
+    "gulp-babel": "~5.0.0",
+    "gulp-concat": "~2.5.2"
   }
 }
