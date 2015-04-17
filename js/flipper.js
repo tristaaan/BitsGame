@@ -167,12 +167,7 @@ class Game {
   }
 
   getRow(bit) {
-   for (let i = 0; i < this.rows; i++) {
-      if (bit < i * this.cols) {
-        return i-1;
-      }
-    }
-    return this.rows - 1;
+    return Math.floor(bit / this.cols)
   }
 
   solved() {
@@ -241,22 +236,22 @@ class AdjacentGame extends Game {
   flipAdjacent(bit) {
     this.flip(bit);
     //top
-    if (this.grid[bit-this.cols]+1) {
+    if (bit - this.cols >= 0) {
       this.flip(bit-this.cols);
     }
 
     //bottom
-    if (this.grid[bit+this.cols]+1) {
+    if (bit + this.cols < this.grid.length) {
       this.flip(bit+this.cols);
     }
 
     //left
-    if (this.grid[bit-1]+1 && this.getRow(bit) === this.getRow(bit-1)) {
+    if (this.getRow(bit) === this.getRow(bit - 1)) {
       this.flip(bit-1);
     }
 
     //right
-    if (this.grid[bit+1]+1 && this.getRow(bit) === this.getRow(bit+1)) {
+    if (this.getRow(bit) === this.getRow(bit + 1)) {
       this.flip(bit+1);
     }
   }
@@ -265,22 +260,22 @@ class AdjacentGame extends Game {
     //flip adjacent tiles
     this.reverseFlip(bit);
     //top
-    if (this.grid[bit-this.cols]+1) {
+    if (bit - this.cols >= 0) {
       this.reverseFlip(bit-this.cols);
     }
 
     //bottom
-    if (this.grid[bit+this.cols]+1) {
+    if (bit + this.cols < this.grid.length) {
       this.reverseFlip(bit+this.cols);
     }
 
     //left
-    if (this.grid[bit-1]+1 && this.getRow(bit) === this.getRow(bit-1)) {
-      this.reverseFlip(bit-1);
+    if (this.getRow(bit) === this.getRow(bit - 1)) {
+      this.reverseFlip(bit - 1);
     }
 
     //right
-    if (this.grid[bit+1]+1 && this.getRow(bit) === this.getRow(bit+1)) {
+    if (this.getRow(bit) === this.getRow(bit+1)) {
       this.reverseFlip(bit+1);
     }
   }
@@ -301,66 +296,50 @@ class StarGame extends Game {
   }
 
   flipStar(bit) {
-    this.flip(bit);
-    //above
-    let i = 1;
-    while (this.grid[bit-this.cols*i]+1) {
-      this.flip(bit-this.cols*i);
-      i++;
+      this.flip(bit);
+      //above
+      for (let i = 1; bit - this.cols * i >= 0; i++) {
+        this.flip(bit-this.cols*i);
+      }
+      
+      //below
+      for (let i = 1; bit + this.cols * i < this.grid.length; i++) {
+        this.flip(bit+this.cols*i);
+      }
+      
+      //left
+      for (let i = 1; this.getRow(bit) === this.getRow(bit - i); i++) {
+        this.flip(bit - i);
+      }
+      
+      //right
+      for (let i = 1; this.getRow(bit) === this.getRow(bit + i); i++) {
+        this.flip(bit + i);
+      }
     }
-
-    //below
-    i = 1;
-    while (this.grid[bit+this.cols*i]+1) {
-      this.flip(bit+this.cols*i);
-      i++;
+    
+    reverseFlipStar(bit) {
+      this.reverseFlip(bit);
+      //above
+      for (let i = 1; bit - this.cols * i >= 0; i++) {
+        this.reverseFlip(bit - this.cols * i);
+      }
+      
+      //below
+      for (let i = 1; bit + this.cols * i < this.grid.length; i++) {
+        this.reverseFlip(bit + this.cols * i);
+      }
+      
+      //left
+      for (let i = 1; this.getRow(bit) == this.getRow(bit - i); i++) {
+        this.reverseFlip(bit - i);
+      }
+      
+      //right
+      for (let i = 1; this.getRow(bit) == this.getRow(bit + i); i++) {
+        this.reverseFlip(bit + i);
+      }
     }
-
-    //left
-    i = 1;
-    while (this.grid[bit-i]+1 && this.getRow(bit) === this.getRow(bit-i)) {
-      this.flip(bit-i);
-      i++;
-    }
-
-    //right
-    i = 1;
-    while (this.grid[bit+i]+1 && this.getRow(bit) === this.getRow(bit+i)) {
-      this.flip(bit+i);
-      i++;
-    }
-  }
-
-  reverseFlipStar(bit) {
-    this.reverseFlip(bit);
-    //above
-    let i = 1;
-    while (this.grid[bit-this.cols*i]+1) {
-      this.reverseFlip(bit-this.cols*i);
-      i++;
-    }
-
-    //below
-    i = 1;
-    while (this.grid[bit+this.cols*i]+1) {
-      this.reverseFlip(bit+this.cols*i);
-      i++;
-    }
-
-    //left
-    i = 1;
-    while (this.grid[bit-i]+1 && this.getRow(bit) === this.getRow(bit-i)) {
-      this.reverseFlip(bit-i);
-      i++;
-    }
-
-    //right
-    i = 1;
-    while (this.grid[bit+i]+1 && this.getRow(bit) === this.getRow(bit+i)) {
-      this.reverseFlip(bit+i);
-      i++;
-    }
-  }
 }
 
 class DoubleGame extends Game {
@@ -381,27 +360,27 @@ class DoubleGame extends Game {
     //flip adjacent tiles
     this.flip(bit)
     //top
-    if (this.grid[bit-this.cols]+1) {
+    if (bit - this.cols >= 0) {
       this.flip(bit-this.cols);
       this.flip(bit-this.cols);
     }
 
     //bottom
-    if (this.grid[bit+this.cols]+1) {
+    if (bit + this.cols < this.grid.length) {
       this.flip(bit+this.cols);
       this.flip(bit+this.cols);
     }
 
     //left
-    if (this.grid[bit-1]+1 && this.getRow(bit) === this.getRow(bit-1)) {
-      this.flip(bit-1);
-      this.flip(bit-1);
+    if (this.getRow(bit) === this.getRow(bit - 1)) {
+      this.flip(bit - 1);
+      this.flip(bit - 1);
     }
 
     //right
-    if (this.grid[bit+1]+1 && this.getRow(bit) === this.getRow(bit+1)) {
-      this.flip(bit+1);
-      this.flip(bit+1);
+    if (this.getRow(bit) === this.getRow(bit + 1)) {
+      this.flip(bit + 1);
+      this.flip(bit + 1);
     }
   }
 
@@ -409,27 +388,27 @@ class DoubleGame extends Game {
     //flip adjacent tiles
     this.reverseFlip(bit);
     //top
-    if (this.grid[bit-this.cols]+1) {
+    if (bit - this.cols >= 0) {
       this.reverseFlip(bit-this.cols);
       this.reverseFlip(bit-this.cols);
     }
 
     //bottom
-    if (this.grid[bit+this.cols]+1) {
+    if (bit + this.cols < this.grid.length) {
       this.reverseFlip(bit+this.cols);
       this.reverseFlip(bit+this.cols);
     }
 
     //left
-    if (this.grid[bit-1]+1 && this.getRow(bit) === this.getRow(bit-1)) {
+    if (this.getRow(bit) === this.getRow(bit - 1)) {
       this.reverseFlip(bit-1);
       this.reverseFlip(bit-1);
     }
 
     //right
-    if (this.grid[bit+1]+1 && this.getRow(bit) === this.getRow(bit+1)) {
-      this.reverseFlip(bit+1);
-      this.reverseFlip(bit+1);
+    if (this.getRow(bit) === this.getRow(bit + 1)) {
+      this.reverseFlip(bit + 1);
+      this.reverseFlip(bit + 1);
     }
   }
 }
