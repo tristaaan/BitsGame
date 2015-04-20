@@ -50,7 +50,7 @@ class Game {
       cells.forEach(el => $(`#${el}`).bind('click', () => this.flipBits(el)) );
     }
 
-    let pattern = `<div id="bitRow">`;
+    let pattern = '';
     for(let i = 0; i < this.variety; i++) {
       pattern += `<div class="miniBit" style="background-color:${this.colors[i]};"></div>`;
     }

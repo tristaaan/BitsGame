@@ -18,7 +18,7 @@ body{
   margin: 0 5px 0 0;
   width: 50px;
   height: 50px;
-  float: left;
+  display: inline-block;
   -webkit-transition: background-color 0.5s ease;
   -moz-transition: background-color 0.5s ease;
   transition: background-color 0.5s ease;
@@ -32,9 +32,18 @@ body{
 .miniBit{
   width: 20px;
   height: 20px;
-  float: left;
+  display: inline-block;
   background-color: #000000;
   margin: 0 5px 0 0;
+}
+
+#board, #pattern{
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 #status{
@@ -45,7 +54,7 @@ body{
 #about{
   margin: 0px auto;
   text-align: left;
-  width: 450px;
+  max-width: 450px;
 }
 
 dt{
