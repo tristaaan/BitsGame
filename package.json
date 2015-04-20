@@ -7,9 +7,11 @@
   "author": "Tristan Wright",
   "license": "ISC",
   "devDependencies": {
+    "browserify": "^9.0.8",
     "gulp": "^3.8.11",
     "gulp-babel": "~5.0.0",
     "gulp-concat": "~2.5.2",
-    "gulp-sourcemaps": "^1.5.2"
+    "gulp-sourcemaps": "^1.5.2",
+    "vinyl-source-stream": "^1.1.0"
   }
 }
