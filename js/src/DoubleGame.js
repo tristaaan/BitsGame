@@ -3,8 +3,8 @@ import Game from './Game'
 
 class DoubleGame extends Game {
   
-  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']) {
-    super(rows, cols, variety, resetGrid, moves, colors);
+  constructor(rows=3, cols=3, variety=2, grid=[], resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']) {
+    super(rows, cols, variety, grid, resetGrid, moves, colors);
     this.mode = 'double';
   }
 

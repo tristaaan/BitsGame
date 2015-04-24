@@ -2,14 +2,20 @@
 
 class Game {
 
-  constructor(rows=3, cols=3, variety=2, resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']) {
+  constructor(rows=3, cols=3, variety=2, grid=[], resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']) {
     this.rows = rows;
     this.cols = cols;
     this.variety = variety;
     this.colors  = colors;
     
-    this.grid      = resetGrid.slice();
-    this.resetGrid = resetGrid.slice();
+    if ( grid.length == 0 && resetGrid.length > 0) {
+      this.grid      = resetGrid.slice();
+      this.resetGrid = resetGrid.slice();
+    }
+    else {
+      this.grid      = grid.slice();
+      this.resetGrid = resetGrid.slice();
+    }
     this.moves     = moves.slice();
 
     this.bitWidth  = $('.bit').width();
@@ -23,6 +29,20 @@ class Game {
     this.resetGrid = [];
     this.moves = [];
     this.draw();
+  }
+
+  saveGridAndMoves() {
+    localStorage.setItem('grid', this.grid);
+    localStorage.setItem('moves', this.moves);
+  }
+
+  saveAll() { 
+    localStorage.setItem('rows', this.rows);
+    localStorage.setItem('cols', this.cols);
+    localStorage.setItem('variety', this.variety);
+    localStorage.setItem('grid', this.grid);
+    localStorage.setItem('moves', this.moves);
+    localStorage.setItem('reset-grid', this.resetGrid);
   }
 
   draw() {
@@ -40,6 +60,9 @@ class Game {
       for(let j = 0; j < this.cols; j++, k++) {
         if (this.resetGrid.length == 0) {
           inner += `<div id="${k}" class="bit" style="background-color:${this.colors[0]};"></div>`;
+        }
+        else if (this.grid.length > 0){
+          inner += `<div id="${k}" class="bit" style="background-color:${this.colors[this.grid[k]]};"></div>`;
         }
         else {
           inner += `<div id="${k}" class="bit" style="background-color:${this.colors[this.resetGrid[k]]};"></div>`;
@@ -64,6 +87,7 @@ class Game {
     if (this.resetGrid.length == 0) {
       this.randomize();
       this.grid.forEach((el, index) => this.resetGrid[index] = el);
+      this.saveAll();
     }
   }
 
@@ -80,13 +104,18 @@ class Game {
 
   resetBoard() {
     this.resetGrid.forEach((el, index) => this.grid[index] = el);
-    this.resetGrid.forEach((el, index) => $('.'+index).css('background-color', this.colors[el]) );
+    this.resetGrid.forEach((el, index) => {
+      $(`#${index}`).css('background-color', this.colors[el]) 
+      console.log(el, this.colors[el]);
+    });
+    this.saveGridAndMoves();
   }
 
   flipBits(bit) {
     this.modeFlip(bit);
     this.moves.push(bit);
     this.solved();
+    this.saveGridAndMoves();
   }
 
   modeFlip(bit) {
