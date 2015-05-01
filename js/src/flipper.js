@@ -68,6 +68,10 @@ function init() {
 
 function restoreData() {
   let mode = localStorage.getItem('mode');
+  if (!mode){
+    return false;
+  }
+  
   let rows = parseInt(localStorage.getItem('rows'));
   let cols = parseInt(localStorage.getItem('cols'));
   let variety = parseInt(localStorage.getItem('variety'));
