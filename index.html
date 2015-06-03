@@ -55,28 +55,13 @@
     </select>
     Mode:
     <select id="modeDropdown">
+      <option value="builder">Builder</option>
       <option value="adjacent">Adjacent</option>
       <option value="star">Continuous</option>
       <option value="double">Single-Double</option>
     </select>
   </div>
-  <div id="about">
-    <br/>
-    <dl>
-      <dt>Goal:</dt>
-      <dd>Turn all the bits black.</dd>
-      <dt>Modes:</dt>
-      <dt class="sub">Adjacent</dt>
-      <dd>The clicked bit and its adjacent bits get incremented by one.<dd>
-      </dd>
-      <dt class="sub">Continuous</dt>
-      <dd>The clicked bit and all bits above, below, left, and right get incremented by one.<dd>
-      </dd>
-      <dt class="sub">Single-Double</dt>
-      <dd>The clicked bit gets incremented by one and the immediate adjacent by two. Best played on a 1 row board and more than two colors.<dd>
-      </dd>
-    </dl>
-  </div>
+  <textarea id="levelOutput" rows="40" cols="100"></textarea>
   <script src="js/compiled.js"></script>
 </body>
 </html>

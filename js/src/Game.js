@@ -37,12 +37,13 @@ class Game {
   }
 
   saveAll() { 
-    localStorage.setItem('rows', this.rows);
-    localStorage.setItem('cols', this.cols);
-    localStorage.setItem('variety', this.variety);
-    localStorage.setItem('grid', this.grid);
-    localStorage.setItem('moves', this.moves);
-    localStorage.setItem('reset-grid', this.resetGrid);
+    return false;
+    // localStorage.setItem('rows', this.rows);
+    // localStorage.setItem('cols', this.cols);
+    // localStorage.setItem('variety', this.variety);
+    // localStorage.setItem('grid', this.grid);
+    // localStorage.setItem('moves', this.moves);
+    // localStorage.setItem('reset-grid', this.resetGrid);
   }
 
   draw() {
@@ -85,7 +86,7 @@ class Game {
     }
 
     if (this.resetGrid.length == 0) {
-      this.randomize();
+      //this.randomize();
       this.grid.forEach((el, index) => this.resetGrid[index] = el);
       this.saveAll();
     }
