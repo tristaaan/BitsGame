@@ -28,6 +28,7 @@ class Game {
   newBoard() {
     this.resetGrid = [];
     this.moves = [];
+    this.grid = [];
     this.draw();
   }
 
@@ -94,10 +95,14 @@ class Game {
   }
 
   randomize() {
-    let boardSize = this.rows * this.cols;
-    for(let i = 0; i < boardSize * 5; i++) {
-      this.modeReverseFlip(this.rand(boardSize));
+    let moves = this.rand(3) + 2;
+    let movesOut = [];
+    for(let i = 0; i < moves; i++) {
+      let move = this.rand(this.rows * this.cols)
+      movesOut.push(move);
+      this.modeReverseFlip(move);
     }
+    console.log(movesOut);
   }
 
   rand(max) {
