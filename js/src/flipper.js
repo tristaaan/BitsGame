@@ -24,7 +24,7 @@ function init() {
 
   function dropDownChange() {
     let [rows, cols, variety] = [rowsDrop, colsDrop, varietyDrop].map((el) => parseInt(el.val(), 10));
-    game = new games[gameMode](rows, cols, variety, game.grid, game.resetGrid);
+    game = new games[gameMode](rows, cols, variety, game.grid, game.grid);
     //localStorage.setItem("mode", gameMode);
   }
 
