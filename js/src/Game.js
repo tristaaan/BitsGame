@@ -32,8 +32,9 @@ class Game {
   }
 
   saveGridAndMoves() {
-    localStorage.setItem('grid', this.grid);
-    localStorage.setItem('moves', this.moves);
+    return false;
+    //localStorage.setItem('grid', this.grid);
+    //localStorage.setItem('moves', this.moves);
   }
 
   saveAll() { 
@@ -86,7 +87,7 @@ class Game {
     }
 
     if (this.resetGrid.length == 0) {
-      //this.randomize();
+      this.randomize();
       this.grid.forEach((el, index) => this.resetGrid[index] = el);
       this.saveAll();
     }
@@ -107,7 +108,7 @@ class Game {
     this.resetGrid.forEach((el, index) => this.grid[index] = el);
     this.resetGrid.forEach((el, index) => {
       $(`#${index}`).css('background-color', this.colors[el]) 
-      console.log(el, this.colors[el]);
+      //console.log(el, this.colors[el]);
     });
     this.saveGridAndMoves();
   }

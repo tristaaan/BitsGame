@@ -4,18 +4,32 @@ import Game from './Game'
 class BuilderGame extends Game {
 
   constructor(rows=3, cols=3, variety=2, grid=[], resetGrid=[], moves=[], colors=['#000', '#00f', '#0f0', '#0ff', '#f00', '#f0f']) {
-    super(rows, cols, variety, grid, [], moves, colors);
+    while (resetGrid.length > rows * cols) {
+      resetGrid.pop();
+    }
+    while (grid.length > rows * cols) {
+      grid.pop();
+    }
+    super(rows, cols, variety, grid, resetGrid, moves, colors);
     this.mode = 'builder';
     this.updateOutput();
   }
 
   modeFlip(bit) {
     this.flip(bit);
+    this.resetGrid = this.grid.slice()
     this.updateOutput();
   }
 
   solved() {
     return false;
+  }
+
+  randomize() {
+    for(let i = 0; i < this.resetGrid.length; i++) {
+      this.resetGrid[i] = 0
+      this.grid[i] = 0
+    }
   }
 
   updateOutput() {

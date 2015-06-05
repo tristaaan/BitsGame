@@ -24,7 +24,7 @@ function init() {
 
   function dropDownChange() {
     let [rows, cols, variety] = [rowsDrop, colsDrop, varietyDrop].map((el) => parseInt(el.val(), 10));
-    game = new games[gameMode](rows, cols, variety, game.grid, game.grid);
+    game = new games[gameMode](rows, cols, variety, game.grid, game.resetGrid);
     //localStorage.setItem("mode", gameMode);
   }
 
@@ -45,9 +45,9 @@ function init() {
 
   let loc = document.location.href;
   if(loc.substr(-5) === '.html' || loc.substr(-1) === '/') {
-    console.log("gets here", game, games);
+    //console.log("gets here", game, games);
     game = new games[gameMode](3, 3, 2);
-    localStorage.setItem('mode', gameMode);
+    //localStorage.setItem('mode', gameMode);
   }
   else {
     let args = loc.split('?')[1].split('+');
