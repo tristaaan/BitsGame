@@ -6,6 +6,11 @@
   "main": "gulpfile.js",
   "author": "Tristan Wright",
   "license": "ISC",
+  "scripts": {
+    "build": "gulp build-prod",
+    "build-dev": "gulp build-dev",
+    "watch": "gulp watch"
+  },
   "devDependencies": {
     "browserify": "^9.0.8",
     "gulp": "^3.8.11",
