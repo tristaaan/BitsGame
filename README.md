@@ -1,10 +1,10 @@
 # Bits
-A simple tile based game using ES6.
+A simple tile based game which eventually became [BitFlipper](https://apps.apple.com/us/app/bitflipper/id1441796255).
 
-## Setup
-ES6 needs to be transpiled, we're using [Babel](https://github.com/babel/babel).
+## Running
 
 ```
 npm install
-gulp
+npm run build
 ```
+open `index.html` in a web browser

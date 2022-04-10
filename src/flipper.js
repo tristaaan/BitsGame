@@ -1,5 +1,3 @@
-'use strict';
-
 import AdjacentGame from './AdjacentGame'
 import StarGame from './StarGame'
 import DoubleGame from './DoubleGame'
@@ -18,15 +16,15 @@ function init() {
     double: DoubleGame
   };
 
+  let rowsDrop = $('#rowsDropdown');
+  let colsDrop = $('#colsDropdown');
+  let varietyDrop = $('#varietyDropdown');
+
   function dropDownChange() {
     let [rows, cols, variety] = [rowsDrop, colsDrop, varietyDrop].map((el) => parseInt(el.val(), 10));
     game = new games[gameMode](rows, cols, variety);
     localStorage.setItem("mode", gameMode);
   }
-
-  let rowsDrop = $('#rowsDropdown');
-  let colsDrop = $('#colsDropdown');
-  let varietyDrop = $('#varietyDropdown');
 
   rowsDrop.bind('change', dropDownChange);
   colsDrop.bind('change', dropDownChange);
