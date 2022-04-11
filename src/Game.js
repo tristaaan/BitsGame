@@ -106,7 +106,6 @@ class Game {
     this.resetGrid.forEach((el, index) => this.grid[index] = el);
     this.resetGrid.forEach((el, index) => {
       $(`#${index}`).css('background-color', this.colors[el]) 
-      console.log(el, this.colors[el]);
     });
     this.saveGridAndMoves();
   }
@@ -175,18 +174,7 @@ class Game {
     //a few characters can be saved by compressing this string into a base [variety] number
     //eg variety=2, board = 110001111 => 399
     //.. variety=6, board = 013452123 => 457971 (prepend 0's when parsing)
-    this.resetGrid.forEach(el => link += el);
-
-    link += '+';
-
-    this.moves.forEach((el, index) => {
-      if (index === this.moves.length-1) {
-        link += el;
-      }
-      else {
-        link += `${el},`;
-      }
-    });
+    link += `${this.resetGrid.join('')}+${this.moves.join(',')}`;
 
     //return document.location.origin + document.location.pathname + link;
     $('#pl').val(document.location.origin + document.location.pathname + link);

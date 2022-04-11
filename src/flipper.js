@@ -34,11 +34,17 @@ function init() {
     dropDownChange();
   });
 
-  $('#resetButton').bind('click', () => game.resetBoard());
-  $('#newButton').bind('click', () => game.newBoard());
+  $('#resetButton').bind('click', () => {
+    game.resetBoard();
+    this.moves = [];
+  });
+  $('#newButton').bind('click', () => {
+    game.newBoard()
+  });
 
   let loc = document.location.href;
   if(loc.substr(-5) === '.html' || loc.substr(-1) === '/') {
+    console.log('restoring from localStorage');
     let localGame = restoreData();
     if (localGame != false){
       game = new games[localGame.mode](
@@ -51,14 +57,17 @@ function init() {
     }
   }
   else {
-    let args = loc.split('?')[1].split('+');
-    let mode = args[0];
-    let [ /* mode */, variety, rows, cols /* resetGrid, moves */] = args.map((el) => parseInt(el, 10));
-    let resetGrid = args[4].split('').map((el) => parseInt(el, 10));
-    let moves = args[5].split(',').map((el) => parseInt(el, 10));
-
+    console.log('restoring from url');
+    const args = loc.split('?')[1].split('+');
+    let [mode, variety, rows, cols, resetGrid, moves] = args;
+    variety = parseInt(variety, 10);
+    rows = parseInt(rows, 10);
+    cols = parseInt(cols, 10);
+    resetGrid = resetGrid.split('').map((el) => parseInt(el, 10));
+    moves = moves.split(',').map((el) => parseInt(el, 10));
+    console.log(mode, variety, rows, cols, resetGrid, moves);
     game = new games[mode](rows, cols, variety, [], resetGrid, moves);
-    setTimeout(() => game.replay(), 1000);
+    setTimeout(() => { game.replay(); }, 1000);
 
     $('#status').html(`Replay of ${moves.length} moves.`);
   }
